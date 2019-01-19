@@ -6,7 +6,7 @@ use time::PreciseTime;
 
 fn main() {
     let t1 = PreciseTime::now();
-    let integral_of_function = composite_simpsons(&function, -2.6, 2.6, 100);
+    let integral_of_function = composite_simpsons(&function, 0., 2.*f64::consts::PI, 100000);
     let t2 = PreciseTime::now();
     println!("Integration took {} seconds", t1.to(t2));
     println!("F approx: {}", integral_of_function);
@@ -14,7 +14,7 @@ fn main() {
 
 
 fn function(a: f64) -> f64 {
-    a.exp().tan().powf(3.)
+    a.sin()
 }
 
 
