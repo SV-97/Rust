@@ -6,17 +6,28 @@ use time::PreciseTime;
 use num::Complex;
 
 const PI: f64 = f64::consts::PI;
-const E: f64 = f64::consts::E;
 
 
-fn fft(f: &Vec<Complex<f64>>) -> Vec<Complex<f64>> {
+fn every_nth<T: Copy>(slice: &[T], n: usize) -> Vec<T>{
+    let slice = slice.to_vec();;
+    let mut result = vec![];
+    for i in 0..slice.len() {
+        if i % n == 0 {
+            result.push(slice[i]);
+        }
+    }
+    result
+}
+
+
+fn fft(f: &[Complex<f64>]) -> Vec<Complex<f64>> {
     let n = f.len();
     if n == 1 {
         f.to_vec()
     } else {
         let half_n = n/2;
-        let g = fft(&(f[0..].iter().step_by(2).cloned().collect::<Vec<Complex<f64>>>()));
-        let u = fft(&(f[1..].iter().step_by(2).cloned().collect::<Vec<Complex<f64>>>()));
+        let g = fft(&every_nth(& f[..], 2)[..]);
+        let u = fft(&every_nth(& f[1..], 2)[..]);
         let mut c_k_1 = vec![Complex {re: 0., im: 0.}; half_n];
         let mut c_k_2 = vec![Complex {re: 0., im: 0.}; half_n];
         for k in 0..half_n {
@@ -24,7 +35,7 @@ fn fft(f: &Vec<Complex<f64>>) -> Vec<Complex<f64>> {
             let n_f = n as f64;
             c_k_1[k] = g[k] + u[k] * (-2. * PI * Complex::i() * k_f / n_f).exp();
             c_k_2[k] = g[k] + u[k] * (-2. *  PI * Complex::i() * k_f / n_f).exp();
-        };
+        }
         c_k_1.append(&mut c_k_2);
         c_k_1
     }
@@ -56,6 +67,6 @@ fn main() {
     let t1 = PreciseTime::now();
     let wave_fft = fft(&wave);
     let t2 = PreciseTime::now();
-    dbg!(&wave_fft);
+    //dbg!(&wave_fft);
     println!("Fourier transform took {} seconds", t1.to(t2));
 }
