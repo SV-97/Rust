@@ -1,0 +1,9 @@
+[package]
+name = "perceptron"
+version = "0.1.0"
+authors = ["Stefan Volz <volzstefan97@googlemail.com>"]
+edition = "2018"
+
+[dependencies]
+rand = "0.6"
+num = "0.2.0"
