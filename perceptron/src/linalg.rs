@@ -42,13 +42,13 @@ pub trait DotProduct<Rhs> {
     fn dot(&self, other: Rhs) -> Self::Output;
 }
 
-impl<N> DotProduct<&Self> for &Vector<N>
+impl<N> DotProduct<Self> for &Vector<N>
 where
     N: num::Float,
 {
     type Output = N;
 
-    fn dot(&self, other: &Self) -> Self::Output {
+    fn dot(&self, other: Self) -> Self::Output {
         self.iter()
             .zip(other.iter())
             .fold(N::zero(), |i, r| i + ((*r.0) * (*r.1)))

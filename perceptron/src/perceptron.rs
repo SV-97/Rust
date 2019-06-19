@@ -71,6 +71,15 @@ where
             self.w += x_ * error;
         }
     }
+
+    /// Predict the output of a given input
+    /// Model has to be trained using fit beforehand
+    /// # Arguments
+    /// 
+    /// * `x` - Input vector
+    pub fn predict(&self, x: &Vector<N>) -> N {
+        activation::heaviside((&self.w).dot(x))
+    }
 }
 
 /// Function that's -1 for x<0, 1 for x>0 and 0 otherwise
@@ -89,9 +98,16 @@ where N: num::Float
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_perceptron() {
+        let seed = [1; 32];
+        let random_gen: rand::rngs::StdRng = rand::SeedableRng::from_seed(seed);
+        let mut p = Perceptron::<_, f32, _>::new(500 as usize, random_gen);
+    }
+    
+    #[test]
+    fn test_fit() {
         let seed = [1; 32];
         let random_gen: rand::rngs::StdRng = rand::SeedableRng::from_seed(seed);
         let mut p = Perceptron::<_, f32, _>::new(500 as usize, random_gen);
@@ -107,5 +123,24 @@ mod tests {
         let w_out = Vector::from(p.w.iter().map(|x| ternarize(x)).collect::<Vec<_>>());
         let w_expected = Vector::from(vec![-1., 1., 1.]);
         assert_eq!(w_out, w_expected);
+    }
+
+    #[test]
+    fn test_predict() {
+        let seed = [1; 32];
+        let random_gen: rand::rngs::StdRng = rand::SeedableRng::from_seed(seed);
+        let mut p = Perceptron::<_, f32, _>::new(500 as usize, random_gen);
+        p.fit(
+            vec![
+                vec![1., 0., 0.].into(),
+                vec![1., 0., 1.].into(),
+                vec![1., 1., 0.].into(),
+                vec![1., 1., 1.].into(),
+            ],
+            vec![0., 1., 1., 1.].into(),
+        );
+
+        let output = p.predict(&Vector::from(vec![1., 0., 0.1]));
+        assert_eq!(ternarize(&output), 0.)
     }
 }
